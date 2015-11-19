@@ -10,7 +10,7 @@ import (
 var GitCommit string
 
 const Name = "consul-template"
-const Version = "0.11.0"
+const Version = "0.12.0"
 const VersionPrerelease = "dev"
 
 func main() {

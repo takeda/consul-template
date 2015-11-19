@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -216,6 +215,7 @@ func TestMerge_configTemplates(t *testing.T) {
 			destination = "1"
 			command = "1"
 			perms = 0600
+			backup = false
 		}
 	`, t)
 	config.Merge(testConfig(`
@@ -224,6 +224,7 @@ func TestMerge_configTemplates(t *testing.T) {
 			destination = "2"
 			command = "2"
 			perms = 0755
+			backup = true
 		}
 	`, t))
 
@@ -233,12 +234,14 @@ func TestMerge_configTemplates(t *testing.T) {
 			Destination: "1",
 			Command:     "1",
 			Perms:       0600,
+			Backup:      false,
 		},
 		&ConfigTemplate{
 			Source:      "2",
 			Destination: "2",
 			Command:     "2",
 			Perms:       0755,
+			Backup:      true,
 		},
 	}
 
@@ -275,23 +278,6 @@ func TestParseConfig_readFileError(t *testing.T) {
 	expected := "no such file or directory"
 	if !strings.Contains(err.Error(), expected) {
 		t.Fatalf("expected %q to include %q", err.Error(), expected)
-	}
-}
-
-func TestParseConfig_parseFileError(t *testing.T) {
-	configFile := test.CreateTempfile([]byte(`
-    invalid file in here
-  `), t)
-	defer test.DeleteTempfile(configFile, t)
-
-	_, err := ParseConfig(configFile.Name())
-	if err == nil {
-		t.Fatal("expected error, but nothing was returned")
-	}
-
-	expected := "syntax error"
-	if !strings.Contains(err.Error(), expected) {
-		t.Fatalf("expected %q to contain %q", err.Error(), expected)
 	}
 }
 
@@ -545,33 +531,6 @@ func TestConfigFromPath_EmptyDirectory(t *testing.T) {
 	_, err = ConfigFromPath(configDir)
 	if err != nil {
 		t.Fatalf("empty directories are allowed")
-	}
-}
-
-func TestConfigFromPath_BadConfigs(t *testing.T) {
-	configDir, err := ioutil.TempDir("", "bad-configs")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(configDir)
-
-	configPath := filepath.Join(configDir, "config")
-	err = ioutil.WriteFile(configPath, []byte(`
-		totally not a valid config
-	`), 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(configPath)
-
-	_, err = ConfigFromPath(configDir)
-	if err == nil {
-		t.Fatalf("expected error, but nothing was returned")
-	}
-
-	expected := "error decoding config at"
-	if !strings.Contains(err.Error(), expected) {
-		t.Fatalf("expected %q to contain %q", err.Error(), expected)
 	}
 }
 

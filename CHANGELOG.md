@@ -1,14 +1,29 @@
 Consul Template Changelog
 =========================
 
-## v0.11.0.dev (Unreleased)
+## v0.12.0.dev (Unreleased)
 
 FEATURES:
 
+
 IMPROVEMENTS:
+
+  * Use the `renew-self` endpoint instead of `renew` for renewing the token
+    [GH-450]
+
+
+BUG FIXES:
+
+
+## v0.11.1 (October 26, 2015)
+
+FEATURES:
 
   * Accept "unix" as an argument to `timestamp` to generate a unix
     timestamp [GH-422]
+
+IMPROVEMENTS:
+
   * Make `Path` a public field on the vault secret dependency so other libraries
     can access it
 
@@ -16,6 +31,16 @@ BUG FIXES:
 
   * Ensure there is a newline at the end of the version output
   * Update README development instructions [GH-423]
+  * Adjust error messages so that data does not always "come from Consul"
+  * Fix race conditions in tests
+  * Update the `LastContact` value for non-Consul dependencies to always
+    return 0 [GH-432, GH-433]
+  * Always use `DefaultConfig()` in tests to find issues
+  * Fix broken math functions - previously add, subtract, multiply, and divide
+    for integers would perform the operation on only the first operand
+    [GH-430, GH-435]
+  * Renew the vault token based off of the auth, not the secret [GH-443]
+  * Remove noisy log message [GH-445]
 
 
 ## v0.11.0 (October 9, 2015)

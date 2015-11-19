@@ -37,7 +37,7 @@ func (d *VaultToken) Fetch(clients *ClientSet, opts *QueryOptions) (interface{},
 		return nil, nil, fmt.Errorf("vault_token: %s", err)
 	}
 
-	token, err := vault.Auth().Token().Renew(vault.Token(), 0)
+	token, err := vault.Auth().Token().RenewSelf(0)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error renewing vault token: %s", err)
 	}
@@ -45,8 +45,8 @@ func (d *VaultToken) Fetch(clients *ClientSet, opts *QueryOptions) (interface{},
 	// Create our cloned secret
 	secret := &Secret{
 		LeaseID:       token.LeaseID,
-		LeaseDuration: token.LeaseDuration,
-		Renewable:     token.Renewable,
+		LeaseDuration: token.Auth.LeaseDuration,
+		Renewable:     token.Auth.Renewable,
 		Data:          token.Data,
 	}
 
@@ -65,7 +65,7 @@ func (d *VaultToken) Fetch(clients *ClientSet, opts *QueryOptions) (interface{},
 
 	ts := time.Now().Unix()
 	rm := &ResponseMetadata{
-		LastContact: time.Duration(ts),
+		LastContact: 0,
 		LastIndex:   uint64(ts),
 	}
 
